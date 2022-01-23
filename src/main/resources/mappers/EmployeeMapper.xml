@@ -107,7 +107,7 @@
             <include refid="Example_Where_Clause" />
         </if>
         <if test="orderByClause != null">
-            order by ${orderByClause}
+            order by emp_id
         </if>
     </select>
 

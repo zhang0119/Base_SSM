@@ -11,8 +11,19 @@ public class Employee {
 
     private Integer dId;
 
+    public Employee() {
+    }
+
     //用department来封装员工的部门信息
     private Department department;
+
+    public Employee(Integer empId, String empName, String gender, String email, Integer dId) {
+        this.empId = empId;
+        this.empName = empName;
+        this.gender = gender;
+        this.email = email;
+        this.dId = dId;
+    }
 
     @Override
     public String toString() {

@@ -4,7 +4,9 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.example.pojo.Department;
 import org.example.pojo.DepartmentExample;
+import org.springframework.stereotype.Component;
 
+@Component
 public interface DepartmentMapper {
     long countByExample(DepartmentExample example);
 

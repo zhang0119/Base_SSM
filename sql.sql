@@ -39,3 +39,24 @@ values('bennett','男','98092234@qq.com',1);
 
 insert into tbl_emp(emp_name, gender, email, d_id)
 values('xiangning','女','397845234@qq.com',2);
+
+insert into tbl_emp(emp_name, gender, email, d_id)
+values('kokomi','女','786843923@qq.com',2);
+
+insert into tbl_emp(emp_name, gender, email, d_id)
+values('xiao','男','8990045234@qq.com',2);
+
+insert into tbl_emp(emp_name, gender, email, d_id)
+values('mona','女','978677845234@qq.com',2);
+
+insert into tbl_emp(emp_name, gender, email, d_id)
+values('hutao','女','176845234@qq.com',2);
+
+insert into tbl_emp(emp_name, gender, email, d_id)
+values('chongyun','男','897845234@qq.com',2);
+
+insert into tbl_emp(emp_name, gender, email, d_id)
+values('ganyu','女','70045234@qq.com',2);
+
+insert into tbl_emp(emp_name, gender, email, d_id)
+values('eula','女','907845234@qq.com',2);
