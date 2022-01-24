@@ -14,7 +14,10 @@
     </typeAliases>
     
     <plugins>
-        <plugin interceptor="com.github.pagehelper.PageInterceptor"/>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!--开启分页合理化-->
+            <property name="reasonable" value="true"/>
+        </plugin>
     </plugins>
 
 </configuration>

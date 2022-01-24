@@ -4,6 +4,16 @@
 <head>
     <title>员工列表</title>
 
+    <%
+        String basePath = request.getScheme()
+                + "://"
+                + request.getServerName()
+                + ":"
+                + request.getServerPort()
+                + request.getContextPath()
+                + "/";
+    %>
+
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 </head>
@@ -65,36 +75,50 @@
         <div class="row">
             <%--分页文字信息--%>
             <div class="col-md-6">
-                当前记录数:
+                当前是第${pageInfo.pageNum}页，总共${pageInfo.pages}页,共${pageInfo.total}条记录
             </div>
 
             <%--分页条信息--%>
             <div class="col-md-6">
                 <nav aria-label="Page navigation">
                     <ul class="pagination">
-                        <li><a href="#">首页</a></li>
+                        <li><a href="<%=basePath%>emps?pn=1">首页</a></li>
+
+                        <%--前一页，即当前页码-1--%>
                         <li>
-                            <a href="#" aria-label="Previous">
+                            <a href="<%=basePath%>emps?pn=${pageInfo.pageNum-1}" aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
                             </a>
                         </li>
-                        <li><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">4</a></li>
-                        <li><a href="#">5</a></li>
+
                         <li>
-                            <a href="#" aria-label="Next">
+                            <c:forEach items="${pageInfo.navigatepageNums}" var="pageNum">
+
+                                <%--这里我们需要做判断，如果是当前页码那么要高亮显示--%>
+                                <%--当前页需要高亮--%>
+                                <c:if test="${pageNum == pageInfo.pageNum}">
+                                    <li class="active"><a href="<%=basePath%>emps?pn=${pageNum}">${pageNum}</a></li>
+                                </c:if>
+                                <%--非当前页--%>
+                                <c:if test="${pageNum != pageInfo.pageNum}">
+                                    <li><a href="<%=basePath%>emps?pn=${pageNum}">${pageNum}</a></li>
+                                </c:if>
+                            </c:forEach>
+                        </li>
+
+                        <%--下一页，即当前页码+1--%>
+                        <li>
+                            <a href="<%=basePath%>emps?pn=${pageInfo.pageNum+1}" aria-label="Next">
                                 <span aria-hidden="true">&raquo;</span>
                             </a>
                         </li>
-                        <li><a href="#">末页</a></li>
+
+                        <li><a href="<%=basePath%>emps?pn=${pageInfo.pages}">末页</a></li>
                     </ul>
                 </nav>
             </div>
 
         </div>
-
 
     </div>
 
