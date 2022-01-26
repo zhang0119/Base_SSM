@@ -20,6 +20,75 @@
 </head>
 <body>
 
+<%--员工添加的模态框------------------------------------------------------------------------------------%>
+<!-- Modal -->
+<div class="modal fade" id="empAddModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">新增员工</h4>
+            </div>
+            <div class="modal-body">
+
+                <form class="form-horizontal">
+                    <%--员工姓名--%>
+                    <div class="form-group">
+                        <label for="empName_add_input" class="col-sm-2 control-label">empName</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="empName" class="form-control" id="empName_add_input" placeholder="empName">
+                        </div>
+                    </div>
+                    <%--员工邮箱--%>
+                    <div class="form-group">
+                        <label for="email_add_input" class="col-sm-2 control-label">email</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="email" class="form-control" id="email_add_input" placeholder="email@qq.com">
+                        </div>
+                    </div>
+                    <%--员工性别--%>
+                    <div class="form-group">
+                        <label for="email_add_input" class="col-sm-2 control-label">gender</label>
+                        <div class="col-sm-10">
+                            <label class="radio-inline">
+                                <input type="radio" name="gender" id="inlineRadio1" value="男" checked> 男
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="gender" id="inlineRadio2" value="女"> 女
+                            </label>
+                        </div>
+                    </div>
+
+                    <%--部门名称--%>
+                    <div class="form-group">
+
+                        <label for="email_add_input" class="col-sm-2 control-label">deptName</label>
+                        <div class="col-sm-4">
+                            <%--部门提交部门id即可--%>
+                            <select class="form-control" name="dId">
+                                <%--<option>1</option>--%>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+
+
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="emp_save_btn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<%--员工添加的模态框------------------------------------------------------------------------%>
+
+
+
 <div class="container">
     <%--整个页面分为4行--%>
 
@@ -33,7 +102,7 @@
     <%--按钮--%>
     <div class="row">
         <div class="col-md-4 col-md-offset-8">
-            <button type="button" class="btn btn-primary">新增</button>
+            <button id="emp_add_modal_btn" type="button" class="btn btn-primary">新增</button>
             <button type="button" class="btn btn-danger">删除</button>
         </div>
     </div>
@@ -86,11 +155,75 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
 
 <script type="text/javascript">
+
+    //引入总记录数
+    var totalRecord;
+
     //1.页面加载完成后，直接去发送ajax请求，要到分页数据
     $(function(){
         //去首页
         to_page(1);
     });
+
+    //当用户点击模态框里的保存按钮就可以保存新员工的信息
+    $("#emp_save_btn").click(function(){
+        //1.将模态框中填写的表单数据交给服务器进行保存
+        //2.发送ajax请求保存员工
+        $.ajax({
+            url:"<%=basePath%>emp",
+            type:"post",
+            data:$("#empAddModal form").serialize(),
+            success:function(result){
+                //alert(result.msg);
+                //当用户保存成功后，我们需要做两个工作：
+                //1.关闭模态框
+                $("#empAddModal").modal('hide');
+                //2.跳转到最后一页
+                //我们给to_page()方法里面传入一个很大的数字，让它自动跳转到最后一页
+                //这里我用总记录数来表示这个很大的数字，因为他肯定大于总页码
+                to_page(totalRecord);
+
+            }
+        });
+
+    });
+
+    //点击新增按钮弹出模态框
+    $("#emp_add_modal_btn").click(function(){
+
+        //发送ajax请求，查出部门信息，显示在下拉列表中
+        getDepts();
+
+        $("#empAddModal").modal({
+            backdrop:"static"
+        });
+
+
+    });
+
+    //查出所有部门信息并显示在下拉列表中
+    function getDepts(){
+        //每次查询部门信息都要清空上一次的查询信息
+        $("#empAddModal select").empty();
+
+        $.ajax({
+            url:"<%=basePath%>depts",
+            type:"get",
+            success:function (result) {
+                //这个result里面都是从数据库中查询到的部门信息
+                //console.log(result);
+                //显示部门信息在下拉列表中
+                /*$("#empAddModal select").append();*/
+                $.each(result.extend.depts,function(){
+                    //this对象表示当前正在遍历的对象
+                    let optionEle = $("<option></option>").append(this.deptName).attr("value",this.deptId);
+                    optionEle.appendTo("#empAddModal select");
+
+                });
+
+            }
+        })
+    }
 
     //这个函数是负责跳转页面的
     function to_page(pn){
@@ -153,6 +286,9 @@
         $("#page_info_area").append("当前是第"+result.extend.pageInfo.pageNum+"页，" +
             "总"+result.extend.pageInfo.pages+"页，" +
             "共"+result.extend.pageInfo.total+"条记录");
+
+        totalRecord = result.extend.pageInfo.total;
+
     }
 
     //这个函数是处理分页条的
@@ -169,6 +305,14 @@
             //表示没有上一页
             firstPageLi.addClass("disabled");
             prePageLi.addClass("disabled");
+        }else{
+            firstPageLi.click(function(){
+                to_page(1);
+            });
+            prePageLi.click(function(){
+                let pn = result.extend.pageInfo.pageNum-1;
+                to_page(pn);
+            });
         }
 
         let nextPageLi = $("<li></li>").append($("<a></a>").append("&raquo;").attr("href","#"));
@@ -179,24 +323,18 @@
             //表示没有下一页
             nextPageLi.addClass("disabled");
             lastPageLi.addClass("disabled");
+        }else{
+            //不是最后一页
+            nextPageLi.click(function(){
+                let pn = result.extend.pageInfo.pageNum+1;
+                to_page(pn);
+            });
+
+            lastPageLi.click(function () {
+                to_page(result.extend.pageInfo.pages);
+            });
+
         }
-
-        firstPageLi.click(function(){
-            to_page(1);
-        });
-        prePageLi.click(function(){
-            let pn = result.extend.pageInfo.pageNum-1;
-            to_page(pn);
-        });
-
-        nextPageLi.click(function(){
-            let pn = result.extend.pageInfo.pageNum+1;
-            to_page(pn);
-        });
-
-        lastPageLi.click(function () {
-            to_page(result.extend.pageInfo.pages);
-        });
 
         //添加首页和前一页的提示
         ul.append(firstPageLi).append(prePageLi);

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -22,6 +23,15 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    //这个方法是封装保存后的新员工数据,这里我们使用restful风格
+    @PostMapping("/emp")
+    @ResponseBody
+    public Msg saveEmp(Employee employee){
+        employeeService.saveEmp(employee);
+        return Msg.success();
+    }
+
 
     //以json的形式返回封装好的分页数据
     @GetMapping("/emps")
