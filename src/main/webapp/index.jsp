@@ -37,6 +37,7 @@
                         <label for="empName_add_input" class="col-sm-2 control-label">empName</label>
                         <div class="col-sm-10">
                             <input type="text" name="empName" class="form-control" id="empName_add_input" placeholder="empName">
+                            <span class="help-block"></span>
                         </div>
                     </div>
                     <%--员工邮箱--%>
@@ -44,6 +45,7 @@
                         <label for="email_add_input" class="col-sm-2 control-label">email</label>
                         <div class="col-sm-10">
                             <input type="text" name="email" class="form-control" id="email_add_input" placeholder="email@qq.com">
+                            <span class="help-block"></span>
                         </div>
                     </div>
                     <%--员工性别--%>
@@ -165,8 +167,86 @@
         to_page(1);
     });
 
+    //校验表单数据
+    function validate_add_form(){
+        //1.拿到要校验的数据，使用正则表达式
+        let empName = $("#empName_add_input").val();
+        let realEmpName = empName.trim();
+        //这个正则表达式表示可以使用a-z、A-Z、0-9和-_ 4到16位，还可以使用中文，长度是2-5位，中间的 | 表示扩展。
+        let regExp = /(^[a-zA-Z0-9_-]{4,16}$)|(^[\u2E80-\u9FFF]{2,5})/;
+        //alert(regExp.test(realEmpName));
+        if(!regExp.test(realEmpName)){
+            //alert("用户名建议2-5位中文或者4-16位英文和数字的组合");
+            //应该清空这个元素之前的样式,我们抽取出这个方法(清空样式的功能)
+            //现在我们抽取这个功能，直接调用这个方法
+            show_validate_msg("#empName_add_input","error","用户名建议2-5位中文或者4-16位英文和数字的组合!");
+
+            /*$("#empName_add_input").parent().addClass("has-error");
+            $("#empName_add_input").next().text("用户名建议2-5位中文或者4-16位英文和数字的组合");*/
+            return false;
+        }else{
+
+            show_validate_msg("#empName_add_input","success","");
+            //验证成功
+            /*$("#empName_add_input").parent().addClass("has-success");
+            $("#empName_add_input").next().text("");*/
+
+        }
+
+        //下一步，校验邮箱信息
+        let email = $("#email_add_input").val();
+        let emailRegExp = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(.[a-zA-Z0-9_-]+)+/;
+        let realEmail = email.trim();
+        //alert(emailRegExp.test(realEmail));
+        if(!emailRegExp.test(realEmail)){
+            //调用show
+            show_validate_msg("#email_add_input","error","请使用正确的邮箱格式");
+            /*$("#email_add_input").parent().addClass("has-error");
+            $("#email_add_input").next().text("请使用正确的邮箱格式");*/
+            return false;
+        }else{
+            //邮箱合法
+            show_validate_msg("#email_add_input","success","");
+            return true;
+            /*$("#empName_add_input").parent().addClass("has-success");
+            $("#email_add_input").next().text("");*/
+        }
+
+    }
+
+    /*
+    *
+    * */
+    function show_validate_msg(ele,status,msg){
+        //清楚当前元素的校验状态
+        $(ele).parent().removeClass("has-success has-error");
+        //清楚span标签内的内容
+        $(ele).next("span").text("");
+
+        if("success" === status){
+            /*show_validate_msg("#empName_add_input","success","");*/
+            /*$("#empName_add_input").parent().addClass("has-success");
+            $("#empName_add_input").next().text("");*/
+            $(ele).parent().addClass("has-success");
+            $(ele).next("span").text(msg);
+
+        }else if("error" === status){
+            /*show_validate_msg("#empName_add_input","error","用户名建议2-5位中文或者4-16位英文和数字的组合!");*/
+            /*$("#empName_add_input").parent().addClass("has-error");
+            $("#empName_add_input").next().text("用户名建议2-5位中文或者4-16位英文和数字的组合");*/
+            $(ele).parent().addClass("has-error");
+            $(ele).next("span").text(msg);
+
+        }
+    }
+
     //当用户点击模态框里的保存按钮就可以保存新员工的信息
     $("#emp_save_btn").click(function(){
+        //0、先对要提交给服务器的表单数据进行校验
+        //如果校验失败，我们直接return false
+        if(!validate_add_form()){
+            return false;
+        }
         //1.将模态框中填写的表单数据交给服务器进行保存
         //2.发送ajax请求保存员工
         $.ajax({
@@ -182,7 +262,6 @@
                 //我们给to_page()方法里面传入一个很大的数字，让它自动跳转到最后一页
                 //这里我用总记录数来表示这个很大的数字，因为他肯定大于总页码
                 to_page(totalRecord);
-
             }
         });
 
@@ -190,6 +269,10 @@
 
     //点击新增按钮弹出模态框
     $("#emp_add_modal_btn").click(function(){
+
+        /*当用户点击新增按钮时，应该清除输入框里的内容*/
+        $("#empName_add_input").val("");
+        $("#email_add_input").val("");
 
         //发送ajax请求，查出部门信息，显示在下拉列表中
         getDepts();
