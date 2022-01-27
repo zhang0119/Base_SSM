@@ -20,7 +20,77 @@
 </head>
 <body>
 
-<%--员工添加的模态框------------------------------------------------------------------------------------%>
+<!--员工修改的模态框----------------------------------------------------------------------------------->
+<!-- Modal -->
+<div class="modal fade" id="empUpdateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">修改员工</h4>
+            </div>
+            <div class="modal-body">
+
+                <form class="form-horizontal">
+                    <%--员工姓名--%>
+                    <div class="form-group">
+                        <label for="empName_add_input" class="col-sm-2 control-label">empName</label>
+                        <div class="col-sm-10">
+                            <%--<input type="text" name="empName" class="form-control" id="empName_update_input" placeholder="empName">
+                            <span class="help-block"></span>--%>
+                            <%--员工名字我们用静态控件--%>
+                            <p class="form-control-static" id="empName_update_static"></p>
+                        </div>
+                    </div>
+                    <%--员工邮箱--%>
+                    <div class="form-group">
+                        <label for="email_add_input" class="col-sm-2 control-label">email</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="email" class="form-control" id="email_update_input" placeholder="email@qq.com">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <%--员工性别--%>
+                    <div class="form-group">
+                        <label for="email_add_input" class="col-sm-2 control-label">gender</label>
+                        <div class="col-sm-10">
+                            <label class="radio-inline">
+                                <input type="radio" name="gender" value="男" checked> 男
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="gender" value="女"> 女
+                            </label>
+                        </div>
+                    </div>
+
+                    <%--部门名称--%>
+                    <div class="form-group">
+
+                        <label for="email_update_input" class="col-sm-2 control-label">deptName</label>
+                        <div class="col-sm-4">
+                            <%--部门提交部门id即可--%>
+                            <select class="form-control" name="dId">
+                                <%--<option>1</option>--%>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="emp_update_btn">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--员工修改的模态框------------------------------------------------------------------------>
+
+
+
+<!--员工添加的模态框------------------------------------------------------------------------------------>
 <!-- Modal -->
 <div class="modal fade" id="empAddModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
@@ -74,9 +144,6 @@
                     </div>
                 </form>
 
-
-
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -87,7 +154,7 @@
 </div>
 
 
-<%--员工添加的模态框------------------------------------------------------------------------%>
+<!--员工添加的模态框------------------------------------------------------------------------>
 
 
 
@@ -149,12 +216,12 @@
 </div>
 
 
-
 <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
 
 <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+
 
 <script type="text/javascript">
 
@@ -166,6 +233,24 @@
         //去首页
         to_page(1);
     });
+
+    //给编辑按钮绑定鼠标单击事件
+    $(document).on("click",".edit_btn",function(){
+        //alert("edit");
+        //0.查出员工信息，显示员工信息
+
+        //1.查出部门信息，并显示部门信息
+        getDepts("#empUpdateModal select");
+
+        //弹出模态框
+        $("#empUpdateModal").modal({
+            backdrop:"static"
+        });
+
+    });
+
+    //这个函数的功能是查询员工信息的
+
 
     //数据库层面校验员工输入的信息是否合法
     $("#empName_add_input").change(function(){
@@ -243,7 +328,7 @@
     }
 
     /*
-    *
+    *显示校验信息
     * */
     function show_validate_msg(ele,status,msg){
         //清楚当前元素的校验状态
@@ -339,7 +424,7 @@
         reset_form("#empAddModal form");
 
         //发送ajax请求，查出部门信息，显示在下拉列表中
-        getDepts();
+        getDepts("#empAddModal select");
 
         $("#empAddModal").modal({
             backdrop:"static"
@@ -348,10 +433,9 @@
 
     });
 
-    //查出所有部门信息并显示在下拉列表中
-    function getDepts(){
+    function getDepts(ele){
         //每次查询部门信息都要清空上一次的查询信息
-        $("#empAddModal select").empty();
+        $(ele).empty();
 
         $.ajax({
             url:"<%=basePath%>depts",
@@ -364,13 +448,37 @@
                 $.each(result.extend.depts,function(){
                     //this对象表示当前正在遍历的对象
                     let optionEle = $("<option></option>").append(this.deptName).attr("value",this.deptId);
+                    //optionEle.appendTo("#empAddModal select");
+                    optionEle.appendTo(ele);
+                });
+            }
+        })
+    }
+
+
+    //查出所有部门信息并显示在下拉列表中
+    /*function getDepts(){
+        //每次查询部门信息都要清空上一次的查询信息
+        $("#empAddModal select").empty();
+
+        $.ajax({
+            url:"<%=basePath%>depts",
+            type:"get",
+            success:function (result) {
+                //这个result里面都是从数据库中查询到的部门信息
+                //console.log(result);
+                //显示部门信息在下拉列表中
+                /!*$("#empAddModal select").append();*!/
+                $.each(result.extend.depts,function(){
+                    //this对象表示当前正在遍历的对象
+                    let optionEle = $("<option></option>").append(this.deptName).attr("value",this.deptId);
                     optionEle.appendTo("#empAddModal select");
 
                 });
 
             }
         })
-    }
+    }*/
 
     //这个函数是负责跳转页面的
     function to_page(pn){
@@ -405,11 +513,11 @@
             var emailTd = $("<td></td>").append(item.email);
             var deptNameTd = $("<td></td>").append(item.department.deptName);
 
-            var editBtn = $("<td></td>").addClass("btn btn-success btn-sm")
+            var editBtn = $("<td></td>").addClass("btn btn-success btn-sm edit_btn")
                 .append("<span></span>").addClass("glyphicon glyphicon-pencil")
                 .append("编辑");
 
-            var delBtn = $("<td></td>").addClass("btn btn-danger btn-sm")
+            var delBtn = $("<td></td>").addClass("btn btn-danger btn-sm del_btn")
                 .append("<span></span>").addClass("glyphicon glyphicon-trash")
                 .append("删除");
 
