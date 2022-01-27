@@ -167,6 +167,34 @@
         to_page(1);
     });
 
+    //数据库层面校验员工输入的信息是否合法
+    $("#empName_add_input").change(function(){
+        //第一种获取empName的方法
+        /*let empName = $("#empName_add_input").val();*/
+        //第二种获取empName的方法
+        let empName = this.value;
+        //发送ajax请求校验用户名是否可用
+        $.ajax({
+            url:"<%=basePath%>checkUser",
+            type:"get",
+            data:"empName="+empName,
+            success:function(result){
+                //后端会返回两种结果，这里我们做个判断
+                /*alert(result);*/
+                if(result.code === 100){
+                    //100表示处理成功
+                    show_validate_msg("#empName_add_input","success","用户名可用!");
+                    //这里我们给提交按钮加上一个属性，用来判断到底该不该提交
+                    $("#emp_save_btn").attr("ajax-va","success");
+                }else{
+                    show_validate_msg("#empName_add_input","error",result.extend.va_msg);
+                    $("#emp_save_btn").attr("ajax-va","error");
+                }
+            }
+
+        })
+    });
+
     //校验表单数据
     function validate_add_form(){
         //1.拿到要校验的数据，使用正则表达式
@@ -248,6 +276,12 @@
             return false;
         }
         //1.将模态框中填写的表单数据交给服务器进行保存
+
+        //1.5、判断之前的ajax用户名校验是否成功
+        if($(this).attr("ajax-va") === "error"){
+            return false;
+        }
+
         //2.发送ajax请求保存员工
         $.ajax({
             url:"<%=basePath%>emp",
@@ -267,12 +301,23 @@
 
     });
 
+    //表单重置的函数
+    function reset_form(ele){
+        $(ele)[0].reset();
+        //清空表单样式
+        $(ele).find("*").removeClass("has-error has-success");
+        //清理表单下方的文本
+        $(ele).find(".help-block").text("");
+    }
+
     //点击新增按钮弹出模态框
     $("#emp_add_modal_btn").click(function(){
 
         /*当用户点击新增按钮时，应该清除输入框里的内容*/
-        $("#empName_add_input").val("");
-        $("#email_add_input").val("");
+        /*$("#empName_add_input").val("");
+        $("#email_add_input").val("");*/
+
+        reset_form("#empAddModal form");
 
         //发送ajax请求，查出部门信息，显示在下拉列表中
         getDepts();

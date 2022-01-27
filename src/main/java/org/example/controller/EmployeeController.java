@@ -7,7 +7,6 @@ import org.example.pojo.Msg;
 import org.example.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +22,27 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    //这个方法是检测用户输入的姓名和数据库里面的是否有冲突
+    @GetMapping("/checkUser")
+    @ResponseBody
+    public Msg checkUser(@RequestParam("empName")String empName){
+
+        //后端校验
+        String nameRegExp = "(^[a-zA-Z0-9_-]{4,16}$)|(^[\u2E80-\u9FFF]{2,5})";
+        if(!empName.matches(nameRegExp)){
+            //这里表示匹配失败
+            return Msg.fail().add("va_msg","用户名必须是4-16位或者中文2-5位");
+        }
+
+        //数据库用户名重复校验
+        boolean result = employeeService.checkUser(empName);
+        if(result){
+            return Msg.success();
+        }else{
+            return Msg.fail().add("va_msg","用户名不可用");
+        }
+    }
 
     //这个方法是封装保存后的新员工数据,这里我们使用restful风格
     @PostMapping("/emp")
