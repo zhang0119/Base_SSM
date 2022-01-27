@@ -7,12 +7,17 @@ import org.example.pojo.Msg;
 import org.example.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 这个处理器主要用来处理员工的CRUD请求的
@@ -45,11 +50,28 @@ public class EmployeeController {
     }
 
     //这个方法是封装保存后的新员工数据,这里我们使用restful风格
+    //bindingResult是封装校验的结果
     @PostMapping("/emp")
     @ResponseBody
-    public Msg saveEmp(Employee employee){
-        employeeService.saveEmp(employee);
-        return Msg.success();
+    public Msg saveEmp(@Valid Employee employee, BindingResult result){
+        if(result.hasErrors()){
+
+            //我们用map集合封装这些错误信息
+            Map<String, Object> map = new HashMap<String, Object>();
+            //校验失败，应该返回失败，在模态框中显示校验失败的错误信息
+            List<FieldError> errors = result.getFieldErrors();
+            for (FieldError error : errors) {
+                System.out.println("错误的字段名:"+error.getField());
+                System.out.println("错误信息:"+error.getDefaultMessage());
+                map.put(error.getField(),error.getDefaultMessage());
+            }
+            return Msg.fail().add("errorFields",map);
+        }else{
+            //保存成功
+            employeeService.saveEmp(employee);
+            return Msg.success();
+        }
+
     }
 
 

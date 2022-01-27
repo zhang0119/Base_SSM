@@ -33,7 +33,7 @@ public class EmployeeService {
 
     /**
      * 检验用户名是否可用
-     * @param empName 待检验的用户名
+     * @param empName 待检验的用户名2
      * @return true 表示姓名可用<br/>false表示不可用
      */
     public boolean checkUser(String empName) {

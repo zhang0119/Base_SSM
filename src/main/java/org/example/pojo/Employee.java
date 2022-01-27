@@ -1,12 +1,22 @@
 package org.example.pojo;
 
+import javax.validation.constraints.Pattern;
+
 public class Employee {
     private Integer empId;
 
+    /**
+     * Pattern 表示是我们自定义校验规则的意思
+     * regexp是校验规则，message是校验失败后的提示信息
+     */
+    @Pattern(regexp = "(^[a-zA-Z0-9_-]{4,16}$)|(^[\u2E80-\u9FFF]{2,5})",
+            message = "用户名必须是4-16位或者中文2-5位")
     private String empName;
 
     private String gender;
 
+    @Pattern(regexp = "(^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(.[a-zA-Z0-9_-]+)+)",
+            message = "请使用正确的邮箱格式")
     private String email;
 
     private Integer dId;

@@ -271,10 +271,12 @@
     //当用户点击模态框里的保存按钮就可以保存新员工的信息
     $("#emp_save_btn").click(function(){
         //0、先对要提交给服务器的表单数据进行校验
-        //如果校验失败，我们直接return false
+        //如果校验失败，我们直接return false , 下面的是前端校验
+
         if(!validate_add_form()){
             return false;
         }
+
         //1.将模态框中填写的表单数据交给服务器进行保存
 
         //1.5、判断之前的ajax用户名校验是否成功
@@ -288,14 +290,31 @@
             type:"post",
             data:$("#empAddModal form").serialize(),
             success:function(result){
-                //alert(result.msg);
-                //当用户保存成功后，我们需要做两个工作：
-                //1.关闭模态框
-                $("#empAddModal").modal('hide');
-                //2.跳转到最后一页
-                //我们给to_page()方法里面传入一个很大的数字，让它自动跳转到最后一页
-                //这里我用总记录数来表示这个很大的数字，因为他肯定大于总页码
-                to_page(totalRecord);
+
+                //现在后端会给我们传入success和error两种情况，我们这里需要做个判断，不能简单只判断哪一种情况.
+                if(result.code === 100){
+                    //alert(result.msg);
+                    //当用户保存成功后，我们需要做两个工作：
+                    //1.关闭模态框
+                    $("#empAddModal").modal('hide');
+                    //2.跳转到最后一页
+                    //我们给to_page()方法里面传入一个很大的数字，让它自动跳转到最后一页
+                    //这里我用总记录数来表示这个很大的数字，因为他肯定大于总页码
+                    to_page(totalRecord);
+                }else{
+                    //用户校验失败，这里显示失败信息
+                    //console.log(result);
+                    /*alert(result.extend.errorFields.email);
+                    alert(result.extend.errorFields.empName);*/ //undefined
+                    if(undefined != result.extend.errorFields.email){
+                        //显示邮箱错误信息
+                        show_validate_msg("#email_add_input","error",result.extend.errorFields.email);
+                    }
+                    if(undefined != result.extend.errorFields.empName){
+                        //显示员工名字的错误信息
+                        show_validate_msg("#empName_add_input","error",result.extend.errorFields.empName);
+                    }
+                }
             }
         });
 
