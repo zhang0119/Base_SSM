@@ -9,12 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +25,54 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    //单个删除用户的功能
+    //现在我们把这个方法改造成单个删除和全部删除二合一
+    //批量删除：1-2-3
+    //单个删除:1
+    @DeleteMapping(value="/emp/{ids}")
+    @ResponseBody
+    public Msg deleteEmpById(@PathVariable("ids") String ids){
+        if(ids.contains("-")){
+            //这是批量删除的操作
+            List<Integer> del_ids = new ArrayList<>();
+            //分割字符串 得到一个数组
+            String[] str_ids = ids.split("-");
+            //创建一个批量删除员工的方法
+            //组装id的集合
+            for (String string : str_ids) {
+                del_ids.add(Integer.parseInt(string));
+            }
+            employeeService.deleteBatch(del_ids);
+
+        }else{
+            //这是单个删除的操作
+            //将String类型的ids转为int类型
+            int id = Integer.parseInt(ids);
+            employeeService.deleteEmp(id);
+        }
+        return Msg.success();
+    }
+
+    //保存员工的功能
+    @PutMapping("/emp/{empId}")
+    @ResponseBody
+    public Msg saveEmp(Employee employee){
+
+        System.out.println("将要更新的数据:"+employee);
+        employeeService.updateEmp(employee);
+        return Msg.success();
+    }
+
+
+    //查询员工的处理器,因为是查询操作，我们使用get请求方式restful风格
+    @GetMapping(value="/emp/{id}")
+    @ResponseBody
+    public Msg getEmp(@PathVariable("id")Integer id){
+
+        Employee employee = employeeService.getEmp(id);
+        return Msg.success().add("emp",employee);
+    }
 
     //这个方法是检测用户输入的姓名和数据库里面的是否有冲突
     @GetMapping("/checkUser")

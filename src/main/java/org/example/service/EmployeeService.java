@@ -46,4 +46,43 @@ public class EmployeeService {
 
         return count == 0;
     }
+
+    /**
+     * 按照员工的id查询员工
+     * @param id 待查询员工的id
+     * @return 待查询员工的信息
+     */
+    public Employee getEmp(Integer id) {
+
+        return employeeMapper.selectByPrimaryKey(id);
+    }
+
+    /**
+     * 员工更新
+     * @param employee 待更新的员工信息
+     */
+    public void updateEmp(Employee employee) {
+        //根据主键有选择的更新
+        employeeMapper.updateByPrimaryKeySelective(employee);
+    }
+
+    /**
+     * 根据员工id删除员工
+     * @param id 待删除员工的id
+     */
+    public void deleteEmp(Integer id) {
+         employeeMapper.deleteByPrimaryKey(id);
+    }
+
+    public void deleteBatch(List<Integer> ids) {
+
+        //根据条件删除员工
+        EmployeeExample example = new EmployeeExample();
+        EmployeeExample.Criteria criteria = example.createCriteria();
+        criteria.andEmpIdIn(ids);
+        //使用完上面三行代码后，sql语句就会变成:
+        // delete from xxx where emp_id in(1,2,3)
+        employeeMapper.deleteByExample(example);
+
+    }
 }
